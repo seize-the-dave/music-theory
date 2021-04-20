@@ -1,18 +1,21 @@
 LETTERS = ['A','B','C','D','E','F','G']
 
+MAJOR_SCALES = ['C','G','D','A','B','F♯','D♭','A♭','E♭','B♭','F']
+MINOR_SCALES = ['A','E','B','F♯','C♯','G♯','D♯','D','G','C','F','B♭','E♭']
+
 NOTES = [
         'A',
-        ['A#','Bb'],
-        ['B','Cb'],
-        ['B#','C'],
-        ['C#','Db'],
+        ['B♭','A♯'],
+        ['B','C♭'],
+        'C',
+        ['C♯','D♭'],
         'D',
-        ['D#','Eb'],
-        ['E','Fb'],
-        ['E#','F'],
-        ['F#','Gb'],
+        ['E♭','D♯'],
+        'E',
+        ['F','E♯'],
+        ['F♯','G♭'],
         'G',
-        ['G#','Ab']
+        ['G♯','A♭']
     ]
 
 def make_tonic(tonic, notes):
@@ -28,29 +31,37 @@ def rotate(l, n):
     return l[n:] + l[:n]
 
 def major_scale(note):
-    return extract_notes(make_tonic(note, NOTES), note, 'WWHWWWH')
+    return extract_notes(make_tonic(note, NOTES), note, 'TTSTTTS')
 
 def minor_scale(note):
-    return extract_notes(make_tonic(note, NOTES), note, 'WHWWHWW')
+    return extract_notes(make_tonic(note, NOTES), note, 'TSTTSTT')
 
 def extract_notes(notes, tonic, pattern):
-    print(tonic)
     scale = [tonic]
     offset = 0
-    last_note = tonic[0]
+    last_letter = tonic[0]
     for step in pattern:
-        if (step == 'W'):
+        if (step == 'T'):
             offset += 2
         else:
             offset += 1
         options = notes[offset % len(notes)]
-        if type(options) == str:
+        this_letter = LETTERS[(LETTERS.index(last_letter) + 1) % len(LETTERS)]
+
+        found = False
+        if type(options) == str and options[0] == this_letter:
             scale.append(options)
-            last_note = options[0]
+            last_letter = options[0]
+            found = True
         elif type(options) == list:
-            starts_with = LETTERS[(LETTERS.index(last_note) + 1) % len(LETTERS)]
             for option in options:
-                if option[0] == starts_with:
+                if option[0] == this_letter:
                     scale.append(option)
-                    last_note = starts_with
+                    last_letter = this_letter
+                    found = True
+        if found == False:
+            print("Couldn't find note matching " + this_letter + " for " + tonic)
+            print("Progress: " + str(scale))
+            print("Was looking in " + str(options))
+                
     return scale
