@@ -29,6 +29,11 @@ class TestTheory(unittest.TestCase):
 
         self.assertEqual(c_major, "Cmaj")
 
+    def test_minor_chord(self):
+        c_minor = theory.Chord("C", "E♭", "G").notation()
+
+        self.assertEqual(c_minor, "Cmin")
+
     def test_circle_of_fifths_major_sharps(self):
         root = "C"
         for i in range(8):
