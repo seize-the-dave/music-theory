@@ -194,6 +194,12 @@ class Scale:
         else:
             return Chord(self.ascending[0], self.ascending[2], self.ascending[4])
 
+    def dominant(self):
+        return self.ascending[4]
+
+    def subdominant(self):
+        return self.ascending[3]
+
     def __str__(self):
         return self.tonic + " " + self.pattern + "; ASC=" + str(self.ascending) + "; DESC=" + str(self.descending)
 
