@@ -3,16 +3,17 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import theory
-for scale in theory.MAJOR_SCALES:
-    print(theory.major_scale(scale))
-    print(theory.major_scale(scale, False))
+import unittest
 
-for scale in theory.MINOR_SCALES:
-    print(theory.minor_scale(scale))
-    print(theory.minor_scale(scale, False))
-    print(theory.harmonic_minor_scale(scale))
-    print(theory.harmonic_minor_scale(scale, False))
-    print(theory.melodic_minor_scale(scale))
-    print(theory.melodic_minor_scale(scale, False))
+class TestTheory(unittest.TestCase):
+    
+    def test_major_scale(self):
+        root = "C"
+        scale = theory.major_scale(root)
 
-# print(theory.minor_scale('B♭'))
+        self.assertListEqual(scale.ascending, ["C", "D", "E", "F", "G", "A", "B", "C"])
+
+    def test_interval(self):
+        perfect_unison = theory.Interval("C", "C").notation()
+
+        self.assertEqual(perfect_unison, "P1")
