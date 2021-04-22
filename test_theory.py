@@ -32,7 +32,7 @@ class TestTheory(unittest.TestCase):
     def test_major_chord(self):
         c_major = theory.Chord("C", "E", "G").notation()
 
-        self.assertEqual(c_major, "Cmaj")
+        self.assertEqual(c_major, "CM")
 
     def test_major_chord_inversions(self):
         c_major = theory.major_scale("C")
@@ -44,7 +44,7 @@ class TestTheory(unittest.TestCase):
     def test_minor_chord(self):
         c_minor = theory.Chord("C", "E♭", "G").notation()
 
-        self.assertEqual(c_minor, "Cmin")
+        self.assertEqual(c_minor, "Cm")
 
     def test_circle_of_fifths_major_sharps(self):
         root = "C"
@@ -81,46 +81,93 @@ class TestTheory(unittest.TestCase):
     def test_diatonic_chords_for_major_key(self):
         scale = theory.major_scale("C")
 
-        self.assertEqual(scale.chord(1).notation(), "Cmaj")
-        self.assertEqual(scale.chord(2).notation(), "Dmin")
-        self.assertEqual(scale.chord(3).notation(), "Emin")
-        self.assertEqual(scale.chord(4).notation(), "Fmaj")
-        self.assertEqual(scale.chord(5).notation(), "Gmaj")
-        self.assertEqual(scale.chord(6).notation(), "Amin")
+        self.assertEqual(scale.chord(1).notation(), "CM")
+        self.assertEqual(scale.chord(2).notation(), "Dm")
+        self.assertEqual(scale.chord(3).notation(), "Em")
+        self.assertEqual(scale.chord(4).notation(), "FM")
+        self.assertEqual(scale.chord(5).notation(), "GM")
+        self.assertEqual(scale.chord(6).notation(), "Am")
         self.assertEqual(scale.chord(7).notation(), "Bdim")
 
     def test_diatonic_chords_for_natural_minor_key(self):
         scale = theory.minor_scale("C")
 
-        self.assertEqual(scale.chord(1).notation(), "Cmin")
+        self.assertEqual(scale.chord(1).notation(), "Cm")
         self.assertEqual(scale.chord(2).notation(), "Ddim")
-        self.assertEqual(scale.chord(3).notation(), "E♭maj")
-        self.assertEqual(scale.chord(4).notation(), "Fmin")
-        self.assertEqual(scale.chord(5).notation(), "Gmin")
-        self.assertEqual(scale.chord(6).notation(), "A♭maj")
-        self.assertEqual(scale.chord(7).notation(), "B♭maj")
+        self.assertEqual(scale.chord(3).notation(), "E♭M")
+        self.assertEqual(scale.chord(4).notation(), "Fm")
+        self.assertEqual(scale.chord(5).notation(), "Gm")
+        self.assertEqual(scale.chord(6).notation(), "A♭M")
+        self.assertEqual(scale.chord(7).notation(), "B♭M")
 
     def test_diatonic_chords_for_harmonic_minor_key(self):
         scale = theory.harmonic_minor_scale("C")
 
-        self.assertEqual(scale.chord(1).notation(), "Cmin")
+        self.assertEqual(scale.chord(1).notation(), "Cm")
         self.assertEqual(scale.chord(2).notation(), "Ddim")
         self.assertEqual(scale.chord(3).notation(), "E♭aug")
-        self.assertEqual(scale.chord(4).notation(), "Fmin")
-        self.assertEqual(scale.chord(5).notation(), "Gmaj")
-        self.assertEqual(scale.chord(6).notation(), "A♭maj")
+        self.assertEqual(scale.chord(4).notation(), "Fm")
+        self.assertEqual(scale.chord(5).notation(), "GM")
+        self.assertEqual(scale.chord(6).notation(), "A♭M")
         self.assertEqual(scale.chord(7).notation(), "Bdim")
 
     def test_diatonic_chords_for_melodic_minor_key(self):
         scale = theory.melodic_minor_scale("C")
 
-        self.assertEqual(scale.chord(1).notation(), "Cmin")
-        self.assertEqual(scale.chord(2).notation(), "Dmin")
+        self.assertEqual(scale.chord(1).notation(), "Cm")
+        self.assertEqual(scale.chord(2).notation(), "Dm")
         self.assertEqual(scale.chord(3).notation(), "E♭aug")
-        self.assertEqual(scale.chord(4).notation(), "Fmaj")
-        self.assertEqual(scale.chord(5).notation(), "Gmaj")
+        self.assertEqual(scale.chord(4).notation(), "FM")
+        self.assertEqual(scale.chord(5).notation(), "GM")
         self.assertEqual(scale.chord(6).notation(), "Adim")
         self.assertEqual(scale.chord(7).notation(), "Bdim")
+
+    def test_all_diatonic_sevenths(self):
+        for key in theory.MAJOR_SCALES:
+            scale = theory.minor_scale("C")
+            for inversion in range(0,3):
+                print(scale.seventh(1, inversion))
+                print(scale.seventh(2, inversion))
+                print(scale.seventh(3, inversion))
+                print(scale.seventh(4, inversion))
+                print(scale.seventh(5, inversion))
+                print(scale.seventh(6, inversion))
+                print(scale.seventh(7, inversion))
+                break
+            break
+
+        # for key in theory.MINOR_SCALES:
+        #     scale = theory.minor_scale(key)
+        #     for inversion in range(0,2):
+        #         print(scale.chord(1, inversion))
+        #         print(scale.chord(2, inversion))
+        #         print(scale.chord(3, inversion))
+        #         print(scale.chord(4, inversion))
+        #         print(scale.chord(5, inversion))
+        #         print(scale.chord(6, inversion))
+        #         print(scale.chord(7, inversion))
+
+        # for key in theory.MINOR_SCALES:
+        #     scale = theory.harmonic_minor_scale(key)
+        #     for inversion in range(0,2):
+        #         print(scale.chord(1, inversion))
+        #         print(scale.chord(2, inversion))
+        #         print(scale.chord(3, inversion))
+        #         print(scale.chord(4, inversion))
+        #         print(scale.chord(5, inversion))
+        #         print(scale.chord(6, inversion))
+        #         print(scale.chord(7, inversion))
+
+        # for key in theory.MINOR_SCALES:
+        #     scale = theory.melodic_minor_scale(key)
+        #     for inversion in range(0,2):
+        #         print(scale.chord(1, inversion))
+        #         print(scale.chord(2, inversion))
+        #         print(scale.chord(3, inversion))
+        #         print(scale.chord(4, inversion))
+        #         print(scale.chord(5, inversion))
+        #         print(scale.chord(6, inversion))
+        #         print(scale.chord(7, inversion))
 
 if __name__ == '__main__':
     unittest.main()

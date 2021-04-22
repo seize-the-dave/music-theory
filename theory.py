@@ -4,14 +4,14 @@ MAJOR_SCALES = ['C','G','D','A','E','B','F♯','C♯','G♯','F','B♭','E♭','
 MINOR_SCALES = ['A','E','B','F♯','C♯','G♯','D♯','A♯','E♯','D','G','C','F','B♭','E♭','A♭','D♭']
 
 NOTES = [
-    ['A','B𝄫'],  # WHITE
+    ['A','B𝄫', 'G𝄪'],  # WHITE
     ['B♭','A♯'], # BLACK
     ['B','C♭'],  # WHITE
     ['C','B♯'],  # WHITE
     ['C♯','D♭'], # BLACK
-    'D',         # WHITE
+    ['D','C𝄪'], # WHITE
     ['E♭','D♯'], # BLACK
-    ['E','F♭'],  # WHITE
+    ['D𝄪','E','F♭'],  # WHITE
     ['F','E♯'],  # WHITE
     ['F♯','G♭'], # BLACK
     ['G','F𝄪'],  # WHITE
@@ -64,6 +64,9 @@ def extract_notes(notes, tonic, ascending, descending, pattern):
                     ascending_scale.append(option)
                     last_letter = this_letter
 
+        if this_letter != last_letter:
+            raise Exception("Couldn't find " + this_letter + " for " + tonic + " scale.  Scale so far: " + str(ascending_scale) + ". Options were " + str(options))
+
     descending_scale = [tonic]
 
     offset = 0
@@ -90,6 +93,9 @@ def extract_notes(notes, tonic, ascending, descending, pattern):
                 if option[0] == this_letter:
                     descending_scale.append(option)
                     last_letter = this_letter
+
+        if this_letter != last_letter:
+            raise Exception("Couldn't find " + this_letter + " for " + tonic + " scale.  Scale so far: " + str(ascending_scale) + ". Options were " + str(options))
                 
     return Scale(tonic, pattern, ascending_scale, descending_scale)
 
@@ -186,17 +192,38 @@ class Scale:
         self.ascending = ascending
         self.descending = descending
 
-    def chord(self, position = 1, inversion = 0):
-        first = (position - 1) % 7
-        second = (position + 1) % 7
-        third = (position + 3) % 7
+    def triad(self, position = 1, inversion = 0):
+        return self.chord(position, inversion, False)
+
+    def seventh(self, position = 1, inversion = 0):
+        return self.chord(position, inversion, True)
+
+    def chord(self, position = 1, inversion = 0, seventh = False):
+        first = self.ascending[(position - 1) % 7]
+        second = self.ascending[(position + 1) % 7]
+        third = self.ascending[(position + 3) % 7]
+        fourth = self.ascending[(position + 5) % 7]
 
         if inversion == 1:
-            return Chord(self.ascending[second], self.ascending[third], self.ascending[first])
+            if seventh:
+                return Chord(second, third, fourth, first)
+            else:
+                return Chord(second, third, first)
         elif inversion == 2:
-            return Chord(self.ascending[third], self.ascending[first], self.ascending[second])
+            if seventh:
+                return Chord(third, fourth, first, second)
+            else:
+                return Chord(third, first, second)
+        elif inversion == 3:
+            if seventh:
+                return Chord(fourth, first, second, third)
+            else:
+                raise Exception("Triads don't have a third inversion")
         else:
-            return Chord(self.ascending[first], self.ascending[second], self.ascending[third])
+            if seventh:
+                return Chord(first, second, third, fourth)
+            else:
+                return Chord(first, second, third)
 
     def dominant(self):
         return self.ascending[4]
@@ -208,6 +235,39 @@ class Scale:
         return self.tonic + " " + self.pattern + "; ASC=" + str(self.ascending) + "; DESC=" + str(self.descending)
 
 class Chord:
+    triads = {
+        'M3': {
+            'M3': 'aug',
+            'm3': 'M'
+        },
+        'm3': {
+            'M3': 'm',
+            'm3': 'dim'
+        }
+    }
+    sevenths = {
+        'M3': {
+            'M3': {
+                'M3': None,
+                'm3': '+M7'
+            },
+            'm3': {
+                'M3': 'M7', # Major seventh
+                'm3': '7' # Dominant seventh
+            }
+        },
+        'm3': {
+            'M3': {
+                'M3': 'mM7', # Minor major seventh
+                'm3': 'm7' # Minor seventh
+            },
+            'm3': {
+                'M3': 'm7♭5', # Half-diminished seventh
+                'm3': 'm♭7♭5' # Diminished seventh
+            }
+        }
+    }
+
     first = None
     second = None
     third = None
@@ -235,37 +295,15 @@ class Chord:
 
         name = self.first
 
-        if step_one == "M3":
-            if step_two == "M3":
-                name += "aug"
-                if step_three == "M3":
-                    pass
-                elif step_three == "m3":
-                    name += "7♯5"
-            else:
-                if step_three == "M3":
-                    name += "maj⁷"
-                elif step_three == "m3":
-                    name += "⁷"
-                else:
-                    name += "maj"
+        if step_three == None:
+            name += self.triads[step_one][step_two]
         else:
-            if step_two == "M3":
-                name += "min"
-                if step_three == "M3":
-                    name += "maj7"
-                elif step_three == "m3":
-                    name += "⁷"
-            else:
-                name += "dim"
-                if step_three == "M3":
-                    name += "7♭5"
-                elif step_three == "m3":
-                    name += "⁷"
+            name += self.sevenths[step_one][step_two][step_three]
+
         return name
 
     def __str__(self):
         if self.fourth == None:
-            return self.first + "-" + self.second + "-" + self.third + "\t(" + self.notation() + ")"
+            return self.first + "-" + self.second + "-" + self.third + "\t" + self.notation()
         else:
-            return self.first + "-" + self.second + "-" + self.third + "-" + self.fourth + "\t(" + self.notation() + ")"
+            return self.first + "-" + self.second + "-" + self.third + "-" + self.fourth + "\t" + self.notation()
