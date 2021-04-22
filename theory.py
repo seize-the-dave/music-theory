@@ -186,13 +186,17 @@ class Scale:
         self.ascending = ascending
         self.descending = descending
 
-    def chord(self, inversion = 0):
+    def chord(self, position = 1, inversion = 0):
+        first = (position - 1) % 7
+        second = (position + 1) % 7
+        third = (position + 3) % 7
+
         if inversion == 1:
-            return Chord(self.ascending[2], self.ascending[4], self.ascending[0])
+            return Chord(self.ascending[second], self.ascending[third], self.ascending[first])
         elif inversion == 2:
-            return Chord(self.ascending[4], self.ascending[0], self.ascending[2])
+            return Chord(self.ascending[third], self.ascending[first], self.ascending[second])
         else:
-            return Chord(self.ascending[0], self.ascending[2], self.ascending[4])
+            return Chord(self.ascending[first], self.ascending[second], self.ascending[third])
 
     def dominant(self):
         return self.ascending[4]
